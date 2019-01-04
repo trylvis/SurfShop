@@ -4,14 +4,28 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
+const session = require('express-session');
+const passport = require('passport');
+const User = require('./models/user');
+const mongoose = require('mongoose');
 
+// Require routes
 const indexRouter   = require('./routes/index');
 const postsRouter   = require('./routes/posts');
 const reviewsRouter = require('./routes/reviews');
 
 const app = express();
 
-// view engine setup
+// Connect to database
+mongoose.connect('mongodb://localhost:27017/surf-shop', {useNewUrlParser: true});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+  console.log('Connected to the database')
+});
+
+// View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -22,6 +36,20 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Configure Passort and sessions
+app.use(session({
+  secret: 'cute cat',
+  resave: false,
+  saveUninitialized: true
+}))
+
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+// Mount routes
 app.use('/', indexRouter);
 app.use('/posts', postsRouter);
 app.use('/posts/:id/reviews', reviewsRouter);
