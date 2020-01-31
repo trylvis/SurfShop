@@ -21,7 +21,7 @@
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^5.0.1",
-    "snyk": "^1.199.2"
+    "snyk": "^1.290.1"
   },
   "devDependencies": {
     "dotenv": "^6.1.0"
